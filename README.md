@@ -1,4 +1,4 @@
-# racket project
+# simple-typer
 
 ### How to use
 

@@ -1,10 +1,10 @@
 #lang scribble/manual
-@require[@for-label[racket-project
+@require[@for-label[simple-typer
                     racket/base]]
 
-@title{racket-project}
+@title{simple-typer}
 @author{Lîm Tsú-thuàn}
 
-@defmodule[racket-project]
+@defmodule[simple-typer]
 
 Package Description Here

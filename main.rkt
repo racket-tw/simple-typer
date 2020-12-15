@@ -5,7 +5,7 @@
 
   (define who (box "world"))
   (command-line
-    #:program "racket-project"
+    #:program "simple-typer"
     #:once-each
     [("-n" "--name") name "Who to say hello to" (set-box! who name)]
     #:args ()
