@@ -54,11 +54,11 @@
   (unless (equal? t1 t2)
     (error 'semantic "expected: ~a got: ~a" t1 t2)))
 
-(define-pass bind-type* : ST (s) -> ST ()
-  (Stmt : Stmt (s) -> Stmt ()
+(define-pass bind-type* : ST (s) -> * ()
+  (Stmt : Stmt (s) -> * ()
         [(: ,x ,t)
-         (bind x t)
-         s]))
+         (bind x t)]
+        [else (void)]))
 (define-pass infer-and-bind-type* : ST (s) -> ST ()
   (Stmt : Stmt (s) -> Stmt ()
         [(:= ,x ,e)
@@ -90,10 +90,9 @@
   (Expr e))
 
 (define (all x)
-  ((compose infer-and-bind-type*
-            bind-type*
-            parse-ST)
-   x))
+  (let ([parsed-x (parse-ST x)])
+    (bind-type* parsed-x)
+    (infer-and-bind-type* parsed-x)))
 
 (all '(: a number))
 (all '(:= a 1))
