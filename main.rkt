@@ -58,16 +58,14 @@
   (Stmt : Stmt (s) -> Stmt ()
         [(: ,x ,t)
          (bind x t)
-         s]
-        [else s]))
+         s]))
 (define-pass infer-and-bind-type* : ST (s) -> ST ()
   (Stmt : Stmt (s) -> Stmt ()
         [(:= ,x ,e)
          (if (lookup x)
              (ty-eq? (lookup x) (infer e))
              (bind x (infer e)))
-         s]
-        [else s]))
+         s]))
 (define-pass infer : ST (e) -> * ()
   (Expr : Expr (e) -> * ()
         [(λ ([,param* ,t*] ...) ,t ,e)
