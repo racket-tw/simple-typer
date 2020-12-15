@@ -29,6 +29,11 @@
        x
        (-> t* ... t)))
 
+(define-language L1
+  (extends ST)
+  (Stmt (stmt)
+    (- (: x t))))
+
 (struct env (cur parent) #:transparent)
 (define (make-env)
   (env (make-hash) (cur-env)))
@@ -57,16 +62,20 @@
 (define-pass bind-type* : ST (s) -> * ()
   (Stmt : Stmt (s) -> * ()
         [(: ,x ,t)
-         (bind x t)]
-        [else (void)]))
-(define-pass infer-and-bind-type* : ST (s) -> ST ()
+         (bind x t)
+         #f]
+        [else #t]))
+(define-pass ST->L1 : ST (s) -> L1 ()
+  (Stmt : Stmt (s) -> Stmt ()
+    [(: ,x ,t) (error 'unreachable)]))
+(define-pass infer-and-bind-type* : L1 (s) -> L1 ()
   (Stmt : Stmt (s) -> Stmt ()
         [(:= ,x ,e)
          (if (lookup x)
              (ty-eq? (lookup x) (infer e))
              (bind x (infer e)))
          s]))
-(define-pass infer : ST (e) -> * ()
+(define-pass infer : L1 (e) -> * ()
   (Expr : Expr (e) -> * ()
         [(λ ([,param* ,t*] ...) ,t ,e)
          (parameterize ([cur-env (make-env)])
@@ -90,9 +99,10 @@
   (Expr e))
 
 (define (all x)
-  (let ([parsed-x (parse-ST x)])
-    (bind-type* parsed-x)
-    (infer-and-bind-type* parsed-x)))
+  (let ([st (parse-ST x)])
+    (when (bind-type* st)
+      ((compose infer-and-bind-type*
+                ST->L1) st))))
 
 (all '(: a number))
 (all '(:= a 1))
