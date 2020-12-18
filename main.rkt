@@ -45,7 +45,7 @@
   (let ([cur-binding (env-cur (cur-env))])
     (when (hash-ref cur-binding id #f)
       (error 'semantic "cannot rebind: `~a`" id))
-    (hash-set! cur-binding id (unparse-ST typ))))
+    (hash-set! cur-binding id typ)))
 (define (lookup id)
   (let ([parent? (env-parent (cur-env))]
         [cur-binding (env-cur (cur-env))])
@@ -62,7 +62,7 @@
 (define-pass bind-type* : ST (s) -> * ()
   (Stmt : Stmt (s) -> * ()
         [(: ,x ,t)
-         (bind x t)
+         (bind x (unparse-ST t))
          #f]
         [else #t]))
 (define-pass ST->L1 : ST (s) -> L1 ()
